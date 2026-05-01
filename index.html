@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Transit Scenario Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <aside class="controls" aria-label="Scenario controls">
+          <div class="brand-row">
+            <div class="mark" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div>
+              <h1>Transit Scenario Studio</h1>
+              <p>Survey-backed customer service training generator</p>
+            </div>
+          </div>
+
+          <form id="scenario-form">
+            <fieldset>
+              <legend>Scenario Type</legend>
+              <label>
+                Issue
+                <select id="issue">
+                  <option value="any">Any issue</option>
+                  <option value="delay">Service delay</option>
+                  <option value="fare">Fare or payment</option>
+                  <option value="lost-item">Lost item</option>
+                  <option value="accessibility">Accessibility support</option>
+                  <option value="safety">Safety concern</option>
+                  <option value="trip-planning">Trip planning</option>
+                  <option value="complaint">Service complaint</option>
+                </select>
+              </label>
+              <label>
+                Mode
+                <select id="mode">
+                  <option value="any">Any mode</option>
+                  <option value="bus">Bus</option>
+                  <option value="light rail">Light rail</option>
+                  <option value="subway">Subway</option>
+                  <option value="commuter rail">Commuter rail</option>
+                  <option value="paratransit">Paratransit</option>
+                </select>
+              </label>
+              <label>
+                Channel
+                <select id="channel">
+                  <option value="phone">Phone</option>
+                  <option value="chat">Live chat</option>
+                  <option value="counter">In-person counter</option>
+                  <option value="email">Email</option>
+                </select>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Customer Dynamics</legend>
+              <label>
+                Emotional tone
+                <select id="tone">
+                  <option value="any">Mixed</option>
+                  <option value="calm">Calm</option>
+                  <option value="confused">Confused</option>
+                  <option value="stressed">Stressed</option>
+                  <option value="angry">Angry</option>
+                  <option value="anxious">Anxious</option>
+                </select>
+              </label>
+              <label>
+                Complexity
+                <input id="complexity" type="range" min="1" max="5" value="3" />
+                <span class="range-label"><span id="complexity-label">Standard</span></span>
+              </label>
+              <label class="check-row">
+                <input id="accessibility" type="checkbox" />
+                Include accessibility consideration
+              </label>
+              <label class="check-row">
+                <input id="policy" type="checkbox" />
+                Include policy edge case
+              </label>
+            </fieldset>
+
+            <div class="actions">
+              <button type="button" id="generate">Generate</button>
+              <button type="button" id="copy">Copy</button>
+              <button type="button" id="reset">Reset</button>
+            </div>
+          </form>
+        </aside>
+
+        <section class="scenario-panel" aria-live="polite">
+          <div class="route-visual" aria-hidden="true">
+            <div class="line blue"></div>
+            <div class="line gold"></div>
+            <div class="line green"></div>
+            <div class="station main"></div>
+            <div class="station s1"></div>
+            <div class="station s2"></div>
+            <div class="station s3"></div>
+          </div>
+
+          <div class="scenario-header">
+            <div>
+              <p class="eyebrow" id="scenario-id">Scenario TSS-001</p>
+              <h2 id="scenario-title">Missed connection after a service delay</h2>
+            </div>
+            <div class="header-tools">
+              <span id="difficulty" class="badge">Standard</span>
+              <div class="view-toggle" role="group" aria-label="Scenario view">
+                <button type="button" id="card-view" class="active" aria-pressed="true">Scenario Card</button>
+                <button type="button" id="roleplay-view" aria-pressed="false">Roleplay Mode</button>
+              </div>
+            </div>
+          </div>
+
+          <section id="roleplay-section" class="roleplay-section hidden" aria-label="Roleplay Mode">
+            <article class="trainer-console">
+              <div class="console-topline">
+                <p class="eyebrow" id="roleplay-progress">Turn 1 of 3</p>
+                <span id="roleplay-state" class="badge">In Roleplay</span>
+              </div>
+              <h3 id="roleplay-heading">Customer Opening</h3>
+              <blockquote id="roleplay-customer-line"></blockquote>
+              <div class="trainer-grid">
+                <section>
+                  <h4>Trainer Coaching Note</h4>
+                  <p id="roleplay-coach-note"></p>
+                </section>
+                <section>
+                  <h4>Expected Agent Behavior</h4>
+                  <p id="roleplay-expected-behavior"></p>
+                </section>
+              </div>
+              <section class="reveal-panel">
+                <h4>Revealed Hidden Details</h4>
+                <ul id="roleplay-revealed"></ul>
+              </section>
+              <section id="trigger-panel" class="trigger-panel hidden">
+                <h4>Reveal by Trainee Question</h4>
+                <p id="trigger-feedback" class="trigger-feedback">Choose the question type the trainee asked.</p>
+                <div class="trigger-actions">
+                  <button type="button" data-trigger="route-time">Route/Time</button>
+                  <button type="button" data-trigger="location">Location</button>
+                  <button type="button" data-trigger="payment">Payment</button>
+                  <button type="button" data-trigger="accessibility">Accessibility</button>
+                  <button type="button" data-trigger="safety">Safety</button>
+                  <button type="button" data-trigger="desired-resolution">Desired Resolution</button>
+                  <button type="button" data-trigger="prior-contact">Prior Contact</button>
+                </div>
+              </section>
+              <div class="roleplay-actions">
+                <button type="button" id="roleplay-prev">Previous</button>
+                <button type="button" id="roleplay-next">Next</button>
+                <button type="button" id="roleplay-reveal">Reveal Next Detail</button>
+                <button type="button" id="roleplay-restart">Restart Roleplay</button>
+              </div>
+            </article>
+
+            <article id="debrief-panel" class="debrief-panel hidden">
+              <div class="console-topline">
+                <p class="eyebrow">Trainer Debrief</p>
+                <span class="badge">Complete</span>
+              </div>
+              <div class="grid">
+                <section>
+                  <h3>Agent Goals</h3>
+                  <ul id="debrief-goals"></ul>
+                </section>
+                <section>
+                  <h3>Evaluation Rubric</h3>
+                  <ul id="debrief-rubric"></ul>
+                </section>
+              </div>
+              <div class="grid">
+                <section>
+                  <h3>Revealed Details</h3>
+                  <ul id="debrief-revealed"></ul>
+                </section>
+                <section>
+                  <h3>Unrevealed Details</h3>
+                  <ul id="debrief-unrevealed"></ul>
+                </section>
+              </div>
+              <section class="case-note">
+                <h3>Case Note Prompt</h3>
+                <p id="case-note-prompt"></p>
+              </section>
+            </article>
+          </section>
+
+          <section id="scenario-card-section" class="card-section">
+            <div class="grid">
+              <article>
+                <h3>Synthetic Customer</h3>
+                <dl id="customer-profile"></dl>
+              </article>
+              <article>
+                <h3>Training Brief</h3>
+                <p id="training-brief"></p>
+              </article>
+            </div>
+
+            <article class="wide source-note">
+              <h3>Survey Basis</h3>
+              <p id="survey-basis"></p>
+            </article>
+
+            <article class="wide">
+              <h3>Customer Opening</h3>
+              <blockquote id="customer-opening"></blockquote>
+            </article>
+
+            <div class="grid">
+              <article>
+                <h3>Known Facts</h3>
+                <ul id="known-facts"></ul>
+              </article>
+              <article>
+                <h3>Hidden Details</h3>
+                <ul id="hidden-details"></ul>
+              </article>
+            </div>
+
+            <div class="grid">
+              <article>
+                <h3>Agent Goals</h3>
+                <ul id="agent-goals"></ul>
+              </article>
+              <article>
+                <h3>Evaluation Rubric</h3>
+                <ul id="rubric"></ul>
+              </article>
+            </div>
+
+            <article class="wide">
+              <h3>Roleplay Turns</h3>
+              <ol id="roleplay-turns"></ol>
+            </article>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="gtfs-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
