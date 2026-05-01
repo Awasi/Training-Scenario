@@ -1,0 +1,1 @@
+This an app that simulates customer service training from synthetic customers created with survey data. It reduces the cost of training development but still requires fine tuning to ensure the scenarios are relevant
